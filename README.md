@@ -1,52 +1,84 @@
-🌡️ IoT Room Temperature Monitoring Dashboard
-Proyek ini adalah sebuah Web Dashboard Monitoring Suhu Ruangan berbasis Fullstack IoT. Sistem ini memungkinkan pengguna untuk memantau kondisi suhu dan kelembapan secara real-time yang didapatkan dari perangkat keras ESP32 dan sensor suhu.
+# 🌡️ IoT Room Temperature Monitoring Dashboard
 
-🚀 Fitur Utama
-Real-time Monitoring: Menampilkan data suhu dan kelembapan langsung saat terjadi perubahan di ruangan.
+Dashboard web modern untuk **monitoring suhu dan kelembapan ruangan secara real-time** berbasis **IoT**.  
+Data dikirim langsung dari **ESP32 + sensor suhu**, diproses oleh backend, lalu divisualisasikan dalam bentuk grafik yang informatif dan mudah dipahami.
 
-Visualisasi Data: Grafik interaktif (Time-series Chart) untuk melihat tren kenaikan atau penurunan suhu dalam periode tertentu.
+> 📡 *Pantau kondisi ruangan, analisis tren suhu, dan deteksi anomali — semuanya dalam satu dashboard.*
 
-Device Status: Indikator status koneksi untuk mengetahui apakah alat ESP32 sedang dalam keadaan online atau offline.
+---
 
-Responsive Design: Antarmuka modern yang dapat diakses dengan nyaman melalui perangkat desktop maupun smartphone.
+## ✨ Fitur Utama
 
-Data Logging: Tabel riwayat data untuk melacak log pengukuran sebelumnya.
+- **⚡ Real-time Monitoring**  
+  Data suhu dan kelembapan diperbarui secara langsung saat sensor membaca perubahan lingkungan.
 
-🛠️ Tech Stack
-Proyek ini dikembangkan menggunakan teknologi:
+- **📊 Visualisasi Data**  
+  Grafik time-series interaktif untuk melihat tren suhu dalam periode tertentu.
 
-Frontend (Fokus Utama)
-React.js / Next.js: Library utama untuk membangun antarmuka pengguna.
+- **🟢 Device Status**  
+  Indikator status koneksi ESP32 (Online / Offline).
 
-Tailwind CSS: Framework CSS untuk desain UI yang bersih dan profesional.
+- **📱 Responsive Design**  
+  Tampilan modern dan optimal di desktop maupun smartphone.
 
-ApexCharts / Chart.js: Library untuk visualisasi data grafik.
+- **🗂️ Data Logging**  
+  Riwayat data pengukuran tersimpan dan dapat ditelusuri kembali.
 
-Lucide Icons: Set ikon minimalis untuk memperjelas informasi.
+---
 
-Hardware & Backend
-ESP32: Mikrokontroler utama dengan dukungan WiFi.
+## 🎯 Use Case
 
-Arduino IDE: Untuk memprogram logika sensor.
+- Monitoring suhu ruangan kelas, lab, atau kantor  
+- Smart home & smart office  
+- Proyek IoT & kebutuhan akademik  
+- Dasar sistem monitoring lingkungan
 
-DHT11/DHT22: Sensor pengukur suhu dan kelembapan.
+---
 
-REST API / MQTT: Protokol pengiriman data dari perangkat ke web.
+## 🛠️ Tech Stack
 
-📐 Arsitektur Sistem
-Sensor membaca data lingkungan.
+### Frontend
+- **React.js / Next.js**  
+- **Tailwind CSS**  
+- **ApexCharts / Chart.js**  
+- **Lucide Icons**
 
-ESP32 mengirimkan data tersebut ke server melalui internet.
+### Hardware & Backend
+- **ESP32** (WiFi-enabled microcontroller)  
+- **DHT11 / DHT22** (Temperature & Humidity Sensor)  
+- **Arduino IDE**  
+- **REST API / MQTT**
 
-Backend memproses dan menyimpan data ke database.
+---
 
-Frontend (proyek ini) mengambil data dari API dan menampilkannya secara visual kepada pengguna.
+## 🧩 Arsitektur Sistem
 
-🖥️ Tampilan Dashboard
-Dashboard ini dirancang dengan prinsip UX (User Experience) yang mengutamakan kemudahan pembacaan data:
+1. Sensor membaca suhu & kelembapan  
+2. ESP32 mengirim data ke server  
+3. Backend memproses dan menyimpan data  
+4. Frontend menampilkan data secara visual
 
-Kartu Statistik: Menampilkan angka suhu terkini dengan warna indikator (Merah: Panas, Hijau: Normal, Biru: Dingin).
+---
 
-Grafik Tren: Memudahkan identifikasi anomali suhu pada jam-jam tertentu.
+## 🖥️ Tampilan Dashboard
 
-Log Aktivitas: Daftar kronologis data yang masuk untuk kebutuhan audit.
+- **Stat Cards**  
+  Menampilkan suhu terkini dengan indikator warna:
+  - 🔴 Panas  
+  - 🟢 Normal  
+  - 🔵 Dingin  
+
+- **Trend Chart**  
+  Membantu analisis pola dan deteksi anomali suhu
+
+- **Activity Log**  
+  Riwayat data masuk tersusun kronologis untuk audit dan evaluasi
+
+---
+
+## 📌 Catatan
+
+Proyek ini dikembangkan sebagai **Fullstack IoT Monitoring Dashboard** dengan fokus pada:
+- keterbacaan data  
+- performa real-time  
+- desain UI minimalis & profesional  

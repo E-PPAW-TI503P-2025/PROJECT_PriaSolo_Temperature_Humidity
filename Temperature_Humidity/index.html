@@ -1,64 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT Room Monitor | Dashboard</title>
-    <meta name="description" content="Real-time IoT Room Temperature and Humidity Monitoring Dashboard">
-    
-    <!-- Google Fonts - Inter -->
+    <title>TempHumid Pro | ESP32 IoT Monitoring</title>
+    <meta name="description"
+        content="Professional Real-time Temperature & Humidity Monitoring System for ESP32 + DHT11">
+
+    <!-- Google Fonts - Inter & Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <i data-lucide="activity" class="logo-icon"></i>
-                    <span class="logo-text">IoT Monitor</span>
+                    <div class="logo-icon-wrapper">
+                        <i data-lucide="gauge" class="logo-icon"></i>
+                    </div>
+                    <div class="logo-text">
+                        <span class="logo-title">TempHumid</span>
+                        <span class="logo-subtitle">Pro Monitor</span>
+                    </div>
                 </div>
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i data-lucide="menu"></i>
-                </button>
             </div>
-            
+
             <nav class="sidebar-nav">
-                <a href="#" class="nav-item active">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i data-lucide="line-chart"></i>
-                    <span>Analytics</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i data-lucide="history"></i>
-                    <span>History</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i data-lucide="settings"></i>
-                    <span>Settings</span>
-                </a>
+                <div class="nav-section">
+                    <span class="nav-section-title">Main Menu</span>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <div class="nav-icon">
+                            <i data-lucide="layout-dashboard"></i>
+                        </div>
+                        <span>Dashboard</span>
+                        <div class="nav-indicator"></div>
+                    </a>
+                    <a href="#" class="nav-item" data-page="analytics">
+                        <div class="nav-icon">
+                            <i data-lucide="bar-chart-3"></i>
+                        </div>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="history">
+                        <div class="nav-icon">
+                            <i data-lucide="history"></i>
+                        </div>
+                        <span>History</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="alerts">
+                        <div class="nav-icon">
+                            <i data-lucide="bell"></i>
+                        </div>
+                        <span>Alerts</span>
+                        <span class="nav-badge">3</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">System</span>
+                    <a href="#" class="nav-item" data-page="devices">
+                        <div class="nav-icon">
+                            <i data-lucide="cpu"></i>
+                        </div>
+                        <span>Devices</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <div class="nav-icon">
+                            <i data-lucide="settings"></i>
+                        </div>
+                        <span>Settings</span>
+                    </a>
+                </div>
             </nav>
-            
+
             <div class="sidebar-footer">
-                <div class="device-info">
-                    <i data-lucide="cpu"></i>
+                <div class="device-card">
+                    <div class="device-status-indicator online"></div>
+                    <div class="device-icon">
+                        <i data-lucide="microchip"></i>
+                    </div>
                     <div class="device-details">
-                        <span class="device-name">ESP32 Device</span>
-                        <span class="device-id">ID: #DHT-001</span>
+                        <span class="device-name">ESP32-WROOM</span>
+                        <span class="device-id">DHT11 Sensor</span>
+                    </div>
+                    <div class="device-signal">
+                        <i data-lucide="wifi"></i>
+                        <span>-45 dBm</span>
                     </div>
                 </div>
             </div>
@@ -72,164 +115,516 @@
                     <button class="mobile-menu-btn" id="mobileMenuBtn">
                         <i data-lucide="menu"></i>
                     </button>
-                    <div class="page-title">
-                        <h1>Dashboard</h1>
-                        <p class="page-subtitle">Real-time room monitoring</p>
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-icon"><i data-lucide="home"></i></span>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="breadcrumb-current" id="currentPageTitle">Dashboard</span>
+                    </div>
+                </div>
+                <div class="header-center">
+                    <div class="live-indicator">
+                        <span class="pulse-dot"></span>
+                        <span>LIVE</span>
                     </div>
                 </div>
                 <div class="header-right">
-                    <div class="last-update">
+                    <div class="header-time">
                         <i data-lucide="clock"></i>
-                        <span id="lastUpdate">Last update: --:--:--</span>
+                        <span id="currentTime">--:--:--</span>
                     </div>
-                    <div class="connection-status" id="connectionStatus">
-                        <span class="status-dot online"></span>
-                        <span class="status-text">Online</span>
+                    <div class="connection-badge" id="connectionBadge">
+                        <span class="connection-dot online"></span>
+                        <span>Connected</span>
                     </div>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i data-lucide="moon" class="theme-icon-dark"></i>
+                        <i data-lucide="sun" class="theme-icon-light"></i>
+                    </button>
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Stats Cards Row -->
-                <div class="stats-row">
-                    <!-- Temperature Card -->
-                    <div class="stat-card temperature-card">
-                        <div class="stat-header">
-                            <div class="stat-icon temperature">
-                                <i data-lucide="thermometer"></i>
+            <!-- Page Content Container -->
+            <div class="page-content">
+                <!-- Dashboard Page -->
+                <div class="page" id="dashboardPage" data-page="dashboard">
+                    <!-- Hero Stats Section -->
+                    <div class="hero-stats">
+                        <!-- Temperature Gauge Card -->
+                        <div class="gauge-card temperature">
+                            <div class="gauge-header">
+                                <div class="gauge-icon">
+                                    <i data-lucide="thermometer"></i>
+                                </div>
+                                <div class="gauge-status" id="tempStatus">
+                                    <span class="status-dot normal"></span>
+                                    <span>Normal</span>
+                                </div>
                             </div>
-                            <div class="stat-badge" id="tempBadge">Normal</div>
-                        </div>
-                        <div class="stat-body">
-                            <div class="stat-value">
-                                <span id="currentTemp">--</span>
-                                <span class="stat-unit">°C</span>
+                            <div class="gauge-body">
+                                <div class="gauge-ring" id="tempGauge">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="gauge-bg" cx="50" cy="50" r="42"></circle>
+                                        <circle class="gauge-progress" cx="50" cy="50" r="42" id="tempProgress">
+                                        </circle>
+                                    </svg>
+                                    <div class="gauge-value">
+                                        <span class="value" id="currentTemp">--</span>
+                                        <span class="unit">°C</span>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="stat-label">Temperature</p>
-                        </div>
-                        <div class="stat-footer">
-                            <div class="stat-trend up" id="tempTrend">
+                            <div class="gauge-footer">
+                                <div class="gauge-label">Temperature</div>
+                                <div class="gauge-range">
+                                    <span class="min">0°C</span>
+                                    <span class="max">50°C</span>
+                                </div>
+                            </div>
+                            <div class="gauge-trend" id="tempTrend">
                                 <i data-lucide="trending-up"></i>
-                                <span>+2.3°C from last hour</span>
+                                <span>+1.2°C from 1h ago</span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Humidity Card -->
-                    <div class="stat-card humidity-card">
-                        <div class="stat-header">
-                            <div class="stat-icon humidity">
-                                <i data-lucide="droplets"></i>
+                        <!-- Humidity Gauge Card -->
+                        <div class="gauge-card humidity">
+                            <div class="gauge-header">
+                                <div class="gauge-icon">
+                                    <i data-lucide="droplets"></i>
+                                </div>
+                                <div class="gauge-status" id="humidStatus">
+                                    <span class="status-dot normal"></span>
+                                    <span>Normal</span>
+                                </div>
                             </div>
-                            <div class="stat-badge" id="humidBadge">Normal</div>
-                        </div>
-                        <div class="stat-body">
-                            <div class="stat-value">
-                                <span id="currentHumid">--</span>
-                                <span class="stat-unit">%</span>
+                            <div class="gauge-body">
+                                <div class="gauge-ring" id="humidGauge">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="gauge-bg" cx="50" cy="50" r="42"></circle>
+                                        <circle class="gauge-progress" cx="50" cy="50" r="42" id="humidProgress">
+                                        </circle>
+                                    </svg>
+                                    <div class="gauge-value">
+                                        <span class="value" id="currentHumid">--</span>
+                                        <span class="unit">%</span>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="stat-label">Humidity</p>
-                        </div>
-                        <div class="stat-footer">
-                            <div class="stat-trend down" id="humidTrend">
+                            <div class="gauge-footer">
+                                <div class="gauge-label">Humidity</div>
+                                <div class="gauge-range">
+                                    <span class="min">0%</span>
+                                    <span class="max">100%</span>
+                                </div>
+                            </div>
+                            <div class="gauge-trend" id="humidTrend">
                                 <i data-lucide="trending-down"></i>
-                                <span>-1.5% from last hour</span>
+                                <span>-2.5% from 1h ago</span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Device Status Card -->
-                    <div class="stat-card status-card">
-                        <div class="stat-header">
-                            <div class="stat-icon status">
-                                <i data-lucide="wifi"></i>
+                        <!-- Device Info Card -->
+                        <div class="info-card device-info-card">
+                            <div class="info-header">
+                                <div class="info-icon">
+                                    <i data-lucide="activity"></i>
+                                </div>
+                                <span class="info-title">System Status</span>
                             </div>
-                            <div class="stat-badge online" id="deviceBadge">Connected</div>
-                        </div>
-                        <div class="stat-body">
-                            <div class="stat-value small">
-                                <span id="uptime">99.8</span>
-                                <span class="stat-unit">%</span>
+                            <div class="info-body">
+                                <div class="info-item">
+                                    <div class="info-item-icon">
+                                        <i data-lucide="wifi"></i>
+                                    </div>
+                                    <div class="info-item-content">
+                                        <span class="info-item-label">WiFi Signal</span>
+                                        <span class="info-item-value" id="wifiSignal">Excellent</span>
+                                    </div>
+                                    <div class="signal-bars">
+                                        <span class="bar active"></span>
+                                        <span class="bar active"></span>
+                                        <span class="bar active"></span>
+                                        <span class="bar active"></span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-item-icon">
+                                        <i data-lucide="clock"></i>
+                                    </div>
+                                    <div class="info-item-content">
+                                        <span class="info-item-label">Uptime</span>
+                                        <span class="info-item-value" id="deviceUptime">12h 34m</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-item-icon">
+                                        <i data-lucide="zap"></i>
+                                    </div>
+                                    <div class="info-item-content">
+                                        <span class="info-item-label">Data Rate</span>
+                                        <span class="info-item-value" id="dataRate">5s interval</span>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-item-icon">
+                                        <i data-lucide="hard-drive"></i>
+                                    </div>
+                                    <div class="info-item-content">
+                                        <span class="info-item-label">Memory</span>
+                                        <span class="info-item-value" id="memoryUsage">42%</span>
+                                    </div>
+                                    <div class="memory-bar">
+                                        <div class="memory-fill" style="width: 42%"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="stat-label">Uptime</p>
-                        </div>
-                        <div class="stat-footer">
-                            <div class="stat-info">
-                                <i data-lucide="signal"></i>
-                                <span>Signal: Excellent</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="charts-section">
-                    <div class="chart-card main-chart">
-                        <div class="card-header">
-                            <h2 class="card-title">
-                                <i data-lucide="activity"></i>
-                                Temperature & Humidity Trends
-                            </h2>
-                            <div class="chart-filters">
-                                <button class="filter-btn active" data-range="today">Today</button>
-                                <button class="filter-btn" data-range="week">This Week</button>
-                                <button class="filter-btn" data-range="month">This Month</button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div id="mainChart"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Data Table Section -->
-                <div class="table-section">
-                    <div class="table-card">
-                        <div class="card-header">
-                            <h2 class="card-title">
-                                <i data-lucide="database"></i>
-                                Data Logs
-                            </h2>
-                            <div class="table-actions">
-                                <button class="action-btn" id="refreshBtn">
+                            <div class="info-footer">
+                                <span class="last-reading">
                                     <i data-lucide="refresh-cw"></i>
-                                    Refresh
-                                </button>
-                                <button class="action-btn" id="exportBtn">
-                                    <i data-lucide="download"></i>
-                                    Export
-                                </button>
+                                    Last reading: <span id="lastUpdate">--:--:--</span>
+                                </span>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="table-wrapper">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Timestamp</th>
-                                            <th>Temperature (°C)</th>
-                                            <th>Humidity (%)</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="dataTableBody">
-                                        <!-- Data will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
+                    </div>
+
+                    <!-- Chart Section -->
+                    <div class="chart-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">
+                                    <i data-lucide="activity"></i>
+                                    <h2>Real-time Monitoring</h2>
+                                </div>
+                                <div class="chart-controls">
+                                    <div class="chart-filters">
+                                        <button class="filter-btn active" data-range="1h">1H</button>
+                                        <button class="filter-btn" data-range="6h">6H</button>
+                                        <button class="filter-btn" data-range="24h">24H</button>
+                                        <button class="filter-btn" data-range="7d">7D</button>
+                                    </div>
+                                    <div class="chart-actions">
+                                        <button class="chart-action-btn" id="refreshChart" title="Refresh">
+                                            <i data-lucide="refresh-cw"></i>
+                                        </button>
+                                        <button class="chart-action-btn" id="fullscreenChart" title="Fullscreen">
+                                            <i data-lucide="maximize-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="table-pagination">
-                                <span class="pagination-info">Showing <span id="showingStart">1</span>-<span id="showingEnd">10</span> of <span id="totalEntries">50</span> entries</span>
-                                <div class="pagination-controls">
-                                    <button class="pagination-btn" id="prevPage">
-                                        <i data-lucide="chevron-left"></i>
+                            <div class="chart-body">
+                                <div id="mainChart"></div>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item temperature">
+                                    <span class="legend-color"></span>
+                                    <span class="legend-label">Temperature (°C)</span>
+                                    <span class="legend-value" id="avgTemp">Avg: --°C</span>
+                                </div>
+                                <div class="legend-item humidity">
+                                    <span class="legend-color"></span>
+                                    <span class="legend-label">Humidity (%)</span>
+                                    <span class="legend-value" id="avgHumid">Avg: --%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon temp-high">
+                                <i data-lucide="arrow-up"></i>
+                            </div>
+                            <div class="stat-mini-content">
+                                <span class="stat-mini-label">Max Temp</span>
+                                <span class="stat-mini-value" id="maxTemp">--°C</span>
+                            </div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon temp-low">
+                                <i data-lucide="arrow-down"></i>
+                            </div>
+                            <div class="stat-mini-content">
+                                <span class="stat-mini-label">Min Temp</span>
+                                <span class="stat-mini-value" id="minTemp">--°C</span>
+                            </div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon humid-high">
+                                <i data-lucide="arrow-up"></i>
+                            </div>
+                            <div class="stat-mini-content">
+                                <span class="stat-mini-label">Max Humidity</span>
+                                <span class="stat-mini-value" id="maxHumid">--%</span>
+                            </div>
+                        </div>
+                        <div class="stat-mini-card">
+                            <div class="stat-mini-icon humid-low">
+                                <i data-lucide="arrow-down"></i>
+                            </div>
+                            <div class="stat-mini-content">
+                                <span class="stat-mini-label">Min Humidity</span>
+                                <span class="stat-mini-value" id="minHumid">--%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Table Section -->
+                    <div class="table-section">
+                        <div class="table-card">
+                            <div class="table-header">
+                                <div class="table-title">
+                                    <i data-lucide="database"></i>
+                                    <h2>Sensor Readings Log</h2>
+                                </div>
+                                <div class="table-actions">
+                                    <button class="table-action-btn" id="refreshBtn">
+                                        <i data-lucide="refresh-cw"></i>
+                                        <span>Refresh</span>
                                     </button>
-                                    <span class="page-numbers" id="pageNumbers"></span>
-                                    <button class="pagination-btn" id="nextPage">
-                                        <i data-lucide="chevron-right"></i>
+                                    <button class="table-action-btn primary" id="exportBtn">
+                                        <i data-lucide="download"></i>
+                                        <span>Export CSV</span>
                                     </button>
                                 </div>
                             </div>
+                            <div class="table-body">
+                                <div class="table-wrapper">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <div class="th-content">
+                                                        <i data-lucide="calendar"></i>
+                                                        Timestamp
+                                                    </div>
+                                                </th>
+                                                <th>
+                                                    <div class="th-content">
+                                                        <i data-lucide="thermometer"></i>
+                                                        Temperature
+                                                    </div>
+                                                </th>
+                                                <th>
+                                                    <div class="th-content">
+                                                        <i data-lucide="droplets"></i>
+                                                        Humidity
+                                                    </div>
+                                                </th>
+                                                <th>
+                                                    <div class="th-content">
+                                                        <i data-lucide="alert-circle"></i>
+                                                        Status
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataTableBody">
+                                            <!-- Data will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="table-pagination">
+                                    <div class="pagination-info">
+                                        Showing <span id="showingStart">1</span>-<span id="showingEnd">10</span> of
+                                        <span id="totalEntries">50</span> entries
+                                    </div>
+                                    <div class="pagination-controls">
+                                        <button class="pagination-btn" id="prevPage">
+                                            <i data-lucide="chevron-left"></i>
+                                        </button>
+                                        <span class="page-numbers" id="pageNumbers"></span>
+                                        <button class="pagination-btn" id="nextPage">
+                                            <i data-lucide="chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div class="page hidden" id="analyticsPage" data-page="analytics">
+                    <div class="page-header">
+                        <h1>Analytics</h1>
+                        <p>Detailed analysis of your sensor data</p>
+                    </div>
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3><i data-lucide="bar-chart-3"></i> Daily Average</h3>
+                            <div id="dailyChart"></div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3><i data-lucide="pie-chart"></i> Status Distribution</h3>
+                            <div id="statusChart"></div>
+                        </div>
+                        <div class="analytics-card wide">
+                            <h3><i data-lucide="trending-up"></i> Weekly Trend</h3>
+                            <div id="weeklyChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Page -->
+                <div class="page hidden" id="historyPage" data-page="history">
+                    <div class="page-header">
+                        <h1>History</h1>
+                        <p>Browse historical sensor data</p>
+                    </div>
+                    <div class="history-controls">
+                        <div class="date-range-picker">
+                            <label>From:</label>
+                            <input type="date" id="historyFrom">
+                            <label>To:</label>
+                            <input type="date" id="historyTo">
+                            <button class="btn-primary" id="applyDateRange">Apply</button>
+                        </div>
+                    </div>
+                    <div class="history-content">
+                        <div id="historyChart"></div>
+                        <div class="history-summary" id="historySummary">
+                            <!-- Summary will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alerts Page -->
+                <div class="page hidden" id="alertsPage" data-page="alerts">
+                    <div class="page-header">
+                        <h1>Alerts</h1>
+                        <p>View and manage system alerts</p>
+                    </div>
+                    <div class="alerts-list" id="alertsList">
+                        <!-- Alerts will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Devices Page -->
+                <div class="page hidden" id="devicesPage" data-page="devices">
+                    <div class="page-header">
+                        <h1>Devices</h1>
+                        <p>Manage your connected IoT devices</p>
+                    </div>
+                    <div class="devices-grid">
+                        <div class="device-detail-card active">
+                            <div class="device-card-header">
+                                <div class="device-chip-icon">
+                                    <i data-lucide="microchip"></i>
+                                </div>
+                                <span class="device-status-badge online">Online</span>
+                            </div>
+                            <div class="device-card-body">
+                                <h3>ESP32-WROOM-32</h3>
+                                <p class="device-desc">Main temperature & humidity sensor</p>
+                                <div class="device-specs">
+                                    <div class="spec-item">
+                                        <span class="spec-label">Sensor</span>
+                                        <span class="spec-value">DHT11</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">Firmware</span>
+                                        <span class="spec-value">v2.1.0</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">IP Address</span>
+                                        <span class="spec-value">192.168.1.100</span>
+                                    </div>
+                                    <div class="spec-item">
+                                        <span class="spec-label">MAC</span>
+                                        <span class="spec-value">AA:BB:CC:DD:EE:FF</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="device-card-footer">
+                                <button class="btn-outline"><i data-lucide="settings"></i> Configure</button>
+                                <button class="btn-outline"><i data-lucide="refresh-cw"></i> Restart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div class="page hidden" id="settingsPage" data-page="settings">
+                    <div class="page-header">
+                        <h1>Settings</h1>
+                        <p>Configure application preferences</p>
+                    </div>
+                    <div class="settings-sections">
+                        <div class="settings-section">
+                            <h3><i data-lucide="bell"></i> Alert Thresholds</h3>
+                            <div class="settings-grid">
+                                <div class="setting-item">
+                                    <label>High Temperature Alert (°C)</label>
+                                    <input type="number" value="30" id="highTempThreshold">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Low Temperature Alert (°C)</label>
+                                    <input type="number" value="18" id="lowTempThreshold">
+                                </div>
+                                <div class="setting-item">
+                                    <label>High Humidity Alert (%)</label>
+                                    <input type="number" value="80" id="highHumidThreshold">
+                                </div>
+                                <div class="setting-item">
+                                    <label>Low Humidity Alert (%)</label>
+                                    <input type="number" value="40" id="lowHumidThreshold">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <h3><i data-lucide="refresh-cw"></i> Data Settings</h3>
+                            <div class="settings-grid">
+                                <div class="setting-item">
+                                    <label>Update Interval (seconds)</label>
+                                    <select id="updateInterval">
+                                        <option value="1">1 second</option>
+                                        <option value="5" selected>5 seconds</option>
+                                        <option value="10">10 seconds</option>
+                                        <option value="30">30 seconds</option>
+                                        <option value="60">1 minute</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label>Data Retention (days)</label>
+                                    <select id="dataRetention">
+                                        <option value="7">7 days</option>
+                                        <option value="30" selected>30 days</option>
+                                        <option value="90">90 days</option>
+                                        <option value="365">1 year</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <h3><i data-lucide="palette"></i> Appearance</h3>
+                            <div class="settings-grid">
+                                <div class="setting-item toggle">
+                                    <label>Dark Mode</label>
+                                    <div class="toggle-switch" id="darkModeToggle">
+                                        <input type="checkbox" id="darkModeCheckbox">
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </div>
+                                <div class="setting-item toggle">
+                                    <label>Enable Animations</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" checked id="animationsCheckbox">
+                                        <span class="toggle-slider"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-actions">
+                            <button class="btn-primary" id="saveSettings">
+                                <i data-lucide="save"></i>
+                                Save Settings
+                            </button>
+                            <button class="btn-outline" id="resetSettings">
+                                <i data-lucide="rotate-ccw"></i>
+                                Reset to Default
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -237,7 +632,14 @@
         </main>
     </div>
 
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Main JavaScript -->
     <script src="app.js"></script>
 </body>
+
 </html>

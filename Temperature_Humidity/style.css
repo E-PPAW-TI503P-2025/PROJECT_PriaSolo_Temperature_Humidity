@@ -2183,3 +2183,247 @@ body {
         padding: 0;
     }
 }
+
+/* ===== Real-time Animation Effects ===== */
+
+/* Value pulse animation when data updates */
+.value-pulse {
+    animation: valuePulse 0.3s ease-out;
+}
+
+@keyframes valuePulse {
+    0% {
+        transform: scale(1);
+        color: var(--text-primary);
+    }
+
+    50% {
+        transform: scale(1.1);
+        color: var(--accent-primary);
+    }
+
+    100% {
+        transform: scale(1);
+        color: var(--text-primary);
+    }
+}
+
+/* Breathing glow effect for active gauges */
+.gauge-card.temperature .gauge-progress {
+    animation: tempGlow 3s ease-in-out infinite;
+}
+
+.gauge-card.humidity .gauge-progress {
+    animation: humidGlow 3s ease-in-out infinite;
+}
+
+@keyframes tempGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 4px rgba(255, 107, 107, 0.4));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 12px rgba(255, 107, 107, 0.7));
+    }
+}
+
+@keyframes humidGlow {
+
+    0%,
+    100% {
+        filter: drop-shadow(0 0 4px rgba(79, 172, 254, 0.4));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 12px rgba(79, 172, 254, 0.7));
+    }
+}
+
+/* Live data flowing indicator */
+.live-indicator {
+    animation: liveGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes liveGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+    }
+}
+
+/* Chart container animation */
+#mainChart {
+    transition: opacity 0.3s ease;
+}
+
+/* Data row highlight on new entry */
+.data-table tbody tr:first-child {
+    animation: newRow 0.5s ease-out;
+}
+
+@keyframes newRow {
+    0% {
+        background: var(--color-success-light);
+        transform: translateX(-10px);
+        opacity: 0;
+    }
+
+    100% {
+        background: transparent;
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Gauge ring smooth transition */
+.gauge-progress {
+    transition: stroke-dashoffset 0.5s ease-out;
+}
+
+/* Status badge animation */
+.gauge-status {
+    transition: all 0.3s ease;
+}
+
+.gauge-status.warning {
+    animation: statusWarning 1s ease-in-out infinite;
+}
+
+.gauge-status.danger {
+    animation: statusDanger 0.5s ease-in-out infinite;
+}
+
+@keyframes statusWarning {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes statusDanger {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+}
+
+/* Smooth number transition effect */
+.gauge-value .value,
+.stat-mini-value {
+    transition: color 0.3s ease;
+}
+
+/* Chart flowing effect marker */
+.apexcharts-marker {
+    animation: markerPulse 2s ease-in-out infinite;
+}
+
+@keyframes markerPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Connection status animation */
+.connection-dot.online {
+    animation: connectionPulse 2s ease-in-out infinite;
+}
+
+@keyframes connectionPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+    }
+
+    50% {
+        opacity: 0.8;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+    }
+}
+
+/* Refresh button spin animation */
+.table-action-btn i,
+.chart-action-btn i {
+    transition: transform 0.3s ease;
+}
+
+.table-action-btn:hover i,
+.chart-action-btn:hover i {
+    transform: rotate(180deg);
+}
+
+/* Real-time data indicator line */
+.chart-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            var(--accent-primary) 50%,
+            transparent 100%);
+    animation: dataFlow 2s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes dataFlow {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.chart-card {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Stats card hover micro-animation */
+.stat-mini-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-mini-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-mini-icon {
+    transition: transform 0.3s ease;
+}
+
+.stat-mini-card:hover .stat-mini-icon {
+    transform: scale(1.1);
+}

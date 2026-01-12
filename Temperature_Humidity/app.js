@@ -3,8 +3,9 @@
 
 // ===== Configuration =====
 const CONFIG = {
-    updateInterval: 5000, // 5 seconds
-    dataRetention: 100, // Keep last 100 readings
+    updateInterval: 2000, // 2 seconds for smoother real-time feel
+    dataRetention: 60, // Keep last 60 readings for cleaner chart
+    chartDataPoints: 30, // Show last 30 points in realtime chart
     thresholds: {
         temp: { low: 18, high: 30, critical: 35 },
         humid: { low: 40, high: 70, critical: 85 }
@@ -338,18 +339,21 @@ function updateStatistics() {
 function initializeMainChart() {
     const isDark = state.theme === 'dark';
 
+    // Use only the last N data points for cleaner real-time display
+    const chartData = state.sensorData.slice(-CONFIG.chartDataPoints);
+
     const options = {
         series: [
             {
                 name: 'Temperature (°C)',
-                data: state.sensorData.map(d => ({
+                data: chartData.map(d => ({
                     x: d.timestamp.getTime(),
                     y: d.temperature
                 }))
             },
             {
                 name: 'Humidity (%)',
-                data: state.sensorData.map(d => ({
+                data: chartData.map(d => ({
                     x: d.timestamp.getTime(),
                     y: d.humidity
                 }))
@@ -361,13 +365,18 @@ function initializeMainChart() {
             fontFamily: 'Inter, sans-serif',
             background: 'transparent',
             toolbar: { show: false },
+            zoom: { enabled: false },
             animations: {
                 enabled: true,
-                easing: 'easeinout',
-                speed: 800,
+                easing: 'linear',
+                speed: 300,
+                animateGradually: {
+                    enabled: true,
+                    delay: 50
+                },
                 dynamicAnimation: {
                     enabled: true,
-                    speed: 350
+                    speed: 200
                 }
             }
         },
@@ -385,9 +394,17 @@ function initializeMainChart() {
             curve: 'smooth',
             width: 3
         },
+        markers: {
+            size: 4,
+            strokeWidth: 0,
+            hover: {
+                size: 6
+            }
+        },
         dataLabels: { enabled: false },
         xaxis: {
             type: 'datetime',
+            range: CONFIG.chartDataPoints * CONFIG.updateInterval,
             labels: {
                 style: {
                     colors: isDark ? '#94a3b8' : '#64748b',
@@ -397,7 +414,7 @@ function initializeMainChart() {
                     year: 'yyyy',
                     month: "MMM 'yy",
                     day: 'dd MMM',
-                    hour: 'HH:mm'
+                    hour: 'HH:mm:ss'
                 }
             },
             axisBorder: { show: false },
@@ -453,7 +470,7 @@ function initializeMainChart() {
         legend: { show: false },
         tooltip: {
             theme: isDark ? 'dark' : 'light',
-            x: { format: 'dd MMM HH:mm' },
+            x: { format: 'HH:mm:ss' },
             y: {
                 formatter: (value, { seriesIndex }) => {
                     return seriesIndex === 0 ? `${value.toFixed(1)}°C` : `${value.toFixed(1)}%`;
@@ -465,6 +482,7 @@ function initializeMainChart() {
     state.chart = new ApexCharts($('#mainChart'), options);
     state.chart.render();
 }
+
 
 function initializeAnalyticsCharts() {
     // Daily Average Chart
@@ -693,9 +711,9 @@ function generateNewDataPoint() {
     const lastData = state.sensorData[state.sensorData.length - 1];
     const hour = new Date().getHours();
 
-    // Add some realistic variation
-    const tempChange = (Math.random() - 0.5) * 0.8;
-    const humidChange = (Math.random() - 0.5) * 1.5;
+    // Add some realistic variation with smoother changes
+    const tempChange = (Math.random() - 0.5) * 0.5;
+    const humidChange = (Math.random() - 0.5) * 1.0;
 
     const newData = {
         timestamp: new Date(),
@@ -715,36 +733,67 @@ function generateNewDataPoint() {
         state.sensorData.shift();
     }
 
-    // Update all displays
+    // Update all displays with animation
     updateDashboard();
     updateStatistics();
 
-    // Update chart
-    state.chart?.updateSeries([
-        {
-            name: 'Temperature (°C)',
-            data: state.sensorData.map(d => ({
-                x: d.timestamp.getTime(),
-                y: d.temperature
-            }))
-        },
-        {
-            name: 'Humidity (%)',
-            data: state.sensorData.map(d => ({
-                x: d.timestamp.getTime(),
-                y: d.humidity
-            }))
-        }
-    ]);
+    // Get the last N data points for smoother chart display
+    const chartData = state.sensorData.slice(-CONFIG.chartDataPoints);
+
+    // Use ApexCharts appendData for smooth real-time streaming effect
+    if (state.chart) {
+        // Update with animation - creates flowing effect
+        state.chart.updateSeries([
+            {
+                name: 'Temperature (°C)',
+                data: chartData.map(d => ({
+                    x: d.timestamp.getTime(),
+                    y: d.temperature
+                }))
+            },
+            {
+                name: 'Humidity (%)',
+                data: chartData.map(d => ({
+                    x: d.timestamp.getTime(),
+                    y: d.humidity
+                }))
+            }
+        ], true); // animate = true
+
+        // Update x-axis range to create scrolling effect
+        const now = new Date().getTime();
+        const windowMs = CONFIG.chartDataPoints * CONFIG.updateInterval;
+
+        state.chart.updateOptions({
+            xaxis: {
+                min: now - windowMs,
+                max: now + (CONFIG.updateInterval / 2)
+            }
+        }, false, false); // Don't animate options change
+    }
 
     // Update table if on first page
     if (state.currentPage === 1) {
         updateTable();
     }
 
+    // Add visual pulse effect to values
+    addPulseEffect('currentTemp');
+    addPulseEffect('currentHumid');
+
     // Check for alerts
     checkAlerts(newData);
 }
+
+// Add visual pulse effect when values update
+function addPulseEffect(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.classList.add('value-pulse');
+        setTimeout(() => element.classList.remove('value-pulse'), 300);
+    }
+}
+
 
 async function fetchSensorData() {
     if (!CONFIG.apiEndpoint) return;

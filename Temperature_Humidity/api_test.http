@@ -1,0 +1,21 @@
+### Create a new temperature reading (and register device)
+POST http://localhost:3000/api/v1/temperature
+Content-Type: application/json
+
+{
+    "temperature": 26.5,
+    "humidity": 65,
+    "device_name": "Sensor-Utama"
+}
+
+### Get latest temperature (Global)
+GET http://localhost:3000/api/v1/temperature/latest
+
+### Get latest temperature for specific device
+GET http://localhost:3000/api/v1/temperature/latest?device_name=Sensor-Utama
+
+### Get temperature history
+GET http://localhost:3000/api/v1/temperature/history?limit=10
+
+### Get devices list
+GET http://localhost:3000/api/v1/devices

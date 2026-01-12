@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Device {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  status    String    @default("offline") // online, offline
+  lastSeen  DateTime  @default(now())
+  readings  Reading[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Reading {
+  id          Int      @id @default(autoincrement())
+  temperature Float
+  humidity    Float?
+  timestamp   DateTime @default(now())
+  device      Device?  @relation(fields: [deviceId], references: [id])
+  deviceId    Int?
+}

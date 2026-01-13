@@ -6,7 +6,7 @@
 
 DHT dht(DHTPIN, DHTTYPE);
 
-float batasSuhu = 30.0; // Suhu batas buzzer (°C)
+float batasSuhu = 35.0; // Suhu batas buzzer (°C)
 
 void setup() {
   Serial.begin(115200);

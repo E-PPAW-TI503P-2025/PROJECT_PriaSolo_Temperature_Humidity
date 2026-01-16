@@ -1,0 +1,11 @@
+{
+  "name": "iot-temperature-monitoring",
+  "version": "1.0.0",
+  "description": "IoT Temperature & Humidity Monitoring System",
+  "scripts": {
+    "start": "npm start --prefix backend",
+    "dev": "npm run dev --prefix backend",
+    "backend": "npm run dev --prefix backend",
+    "frontend": "npm run dev --prefix backend"
+  }
+}

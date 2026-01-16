@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - IoT Monitoring System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card fade-in">
+            <div class="login-header">
+                <!-- Icon removed -->
+                <h1 class="login-title">NEW ACCOUNT</h1>
+                <p class="login-subtitle">REGISTER USER ACCESS</p>
+            </div>
+
+            <form id="registerForm" class="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="username">USERNAME</label>
+                    <input type="text" id="username" class="form-input" placeholder="Enter username" required
+                        minlength="3">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">PASSWORD</label>
+                    <input type="password" id="password" class="form-input" placeholder="Min 6 characters" required
+                        minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="confirmPassword">CONFIRM PASSWORD</label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="Repeat password"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="role">ROLE</label>
+                    <select id="role" class="form-input">
+                        <option value="teknisi">TECHNICIAN</option>
+                        <option value="admin">ADMINISTRATOR</option>
+                    </select>
+                </div>
+
+                <div id="errorMessage"
+                    style="display: none; color: #ef4444; font-size: 0.875rem; margin-bottom: 1rem; text-align: center;">
+                </div>
+                <div id="successMessage"
+                    style="display: none; color: #10b981; font-size: 0.875rem; margin-bottom: 1rem; text-align: center;">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="registerBtn">
+                    <span id="registerText">REGISTER</span>
+                    <span id="registerSpinner" style="display: none;">Wait...</span>
+                </button>
+            </form>
+
+            <div class="login-footer" style="margin-top: 1.5rem;">
+                <p>Have an account? <a href="login.html" style="color: var(--accent-blue);">LOGIN</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const role = document.getElementById('role').value;
+
+            const errorMsg = document.getElementById('errorMessage');
+            const successMsg = document.getElementById('successMessage');
+
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            // Validate
+            if (password !== confirmPassword) {
+                errorMsg.textContent = 'Passwords do not match!';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMsg.textContent = 'Password must be at least 6 characters!';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                document.getElementById('registerBtn').disabled = true;
+                document.getElementById('registerText').style.display = 'none';
+                document.getElementById('registerSpinner').style.display = 'inline';
+
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successMsg.textContent = 'Registration successful! Redirecting...';
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 2000);
+                } else {
+                    errorMsg.textContent = data.message || 'Registration failed';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Error: ' + error.message;
+                errorMsg.style.display = 'block';
+            } finally {
+                document.getElementById('registerBtn').disabled = false;
+                document.getElementById('registerText').style.display = 'inline';
+                document.getElementById('registerSpinner').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
